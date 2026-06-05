@@ -2,6 +2,7 @@ using MarketplaceData.Services.Logger;
 using Microsoft.EntityFrameworkCore;
 using Scalar;
 using Scalar.AspNetCore;
+using Serilog;
 using VetAPI.Services;
 using VetClassLibrary.Interfaces;
 using VetClassLibrary.Services;
@@ -13,10 +14,22 @@ namespace MarketplaceAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-                        
+
+            Log.Logger = new LoggerConfiguration()
+                            .MinimumLevel.Information()
+                            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+                            .WriteTo.File("logs/audit.txt",
+                                rollingInterval: RollingInterval.Day,
+                                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                            .CreateLogger();
+
+            builder.Host.UseSerilog();
+
+
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
 
+            builder.Services.AddEndpointsApiExplorer();
 
             builder.Services.AddScoped<IApiUserAuthService, ApiUserAuthService>();
             builder.Services.AddScoped<IUserService, UserService>();
@@ -37,6 +50,8 @@ namespace MarketplaceAPI
 
             app.UseHttpsRedirection();
 
+
+            app.UseMiddleware<AuditLoggingMiddleware>();
             app.UseMiddleware<GlobalExeptionHandler>();
 
             app.UseAuthorization();
@@ -44,7 +59,19 @@ namespace MarketplaceAPI
 
             app.MapControllers();
 
-            app.Run();
+            try
+            {
+                Log.Information("Starting web host");
+                app.Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Host terminated unexpectedly");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
     }
 }
