@@ -16,7 +16,7 @@ namespace Domain
             _dbSet = context.Set<T>();
         }
 
-        public IEnumerable<T> GetAll() => _dbSet.ToList();
+        public virtual IEnumerable<T> GetAll() => _dbSet.ToList();
 
         public T? GetById(int id)
         {

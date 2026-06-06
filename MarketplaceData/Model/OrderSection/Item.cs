@@ -20,7 +20,7 @@ namespace VetClassLibrary.Model
         [MaxLength(200)]
         public string Description { get; set; } = null!;
 
-        public IEnumerable<string> ImageUrls { get; set; } = new List<string>();
+        public List<string> ImageUrls { get; set; } = new List<string>();
 
 
 

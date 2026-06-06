@@ -1,12 +1,16 @@
-﻿using VetClassLibrary.Model;
-using VetClassLibrary.Model.User;
-using Microsoft.EntityFrameworkCore;
-using VetClassLibrary.Model.Storage;
+using MarketplaceData.Model;
 using MarketplaceData.Model.Cart;
-
+using MarketplaceData.Model.User;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using System;
+using VetClassLibrary.Model;
+using VetClassLibrary.Model.Storage;
+using VetClassLibrary.Model.User;
 namespace VetClassLibrary.Services
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext :  IdentityDbContext
     {
         private readonly string _connectionString;
 
@@ -46,179 +50,189 @@ namespace VetClassLibrary.Services
 
             modelBuilder.Entity<Client>().HasIndex(u => u.Username).IsUnique();
 
+            modelBuilder.Entity<Company>()
+                .HasOne(c => c.Owner)
+                .WithMany()
+                .HasForeignKey(c => c.OwnerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Company>()
+                .HasMany(c => c.Employees)
+                .WithOne(s => s.Company)
+                .HasForeignKey(s => s.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
             //// ==========================================
             //// SEED DATA (Начальные данные)
             //// ==========================================
 
-            //// 1. Сидирование пользователей
-            //modelBuilder.Entity<Client>().HasData(
-                //new Client
-                //{
-                    //Id = 1,
-                    //FullName = "Михайло Стадніков",
-                    //Username = "admin",
-                    //Password = "admin",
-                    //Role = UserRoles.Admin
-                //},
-                //new Client
-                //{
-                    //Id = 2,
-                    //FullName = "Олексій Романенко",
-                    //Username = "cashier",
-                    //Password = "cashier",
-                    //Role = UserRoles.Worker
-                //}
-            //);
+            // 1. Categories
+            modelBuilder.Entity<Category>().HasData(
+                new { Id = 1, Name = "Electronics", ImageUrl = "" },
+                new { Id = 2, Name = "Clothing", ImageUrl = "" }
+            );
 
-            //// 2. Сидирование владельцев (Owners)
-            //modelBuilder.Entity<Owner>().HasData(
-                //new Owner
-                //{
-                    //Id = 1,
-                    //FullName = "Іван Петренко",
-                    //PhoneNumber = "+380501112233",
-                    //Address = "м. Київ, вул. Хрещатик, 1",
-                    //Email = "ivan.p@example.com",
-                    //Notes = "Постійний клієнт"
-                //},
-                //new Owner
-                //{
-                    //Id = 2,
-                    //FullName = "Марія Коваленко",
-                    //PhoneNumber = "+380674445566",
-                    //Address = "м. Львів, вул. Франка, 25",
-                    //Notes = "Знижка 5%"
-                //}
-            //);
+            // 2. Carts
+            modelBuilder.Entity<Cart>().HasData(
+                new { Id = 1 },
+                new { Id = 2 }
+            );
 
-            //// 3. Сидирование пациентов (Patients)
-            //modelBuilder.Entity<Patient>().HasData(
-                //new Patient
-                //{
-                    //Id = 1,
-                    //OwnerId = 1,
-                    //Name = "Барсік",
-                    //Species = "Кіт",
-                    //Breed = "Британська короткошерста",
-                    //Sex = "Чоловічий",
-                    //IsSterilized = true,
-                    //DateOfBirth = new DateTime(2020, 5, 10)
-                //},
-                //new Patient
-                //{
-                    //Id = 2,
-                    //OwnerId = 1,
-                    //Name = "Рекс",
-                    //Species = "Собака",
-                    //Breed = "Німецька вівчарка",
-                    //Sex = "Чоловічий",
-                    //IsSterilized = false,
-                    //DateOfBirth = new DateTime(2018, 8, 15)
-                //},
-                //new Patient
-                //{
-                    //Id = 3,
-                    //OwnerId = 2,
-                    //Name = "Мурка",
-                    //Species = "Кішка",
-                    //Breed = "Мейн-кун",
-                    //Sex = "Жіночий",
-                    //IsSterilized = true,
-                    //DateOfBirth = new DateTime(2022, 1, 20)
-                //}
-            //);
+            // 3. Clients
+            modelBuilder.Entity<Client>().HasData(
+                new 
+                {
+                    Id = 1,
+                    FullName = "Ivan Petrenko",
+                    Username = "ivan_petr",
+                    Password = "password",
+                    Role = VetClassLibrary.Model.User.UserRoles.Client,
+                    Email = "ivan@example.com",
+                    PhoneNumber = "+380501112233",
+                    CartId = 1,
+                    Address = "Kyiv, Khreshchatyk, 1"
+                },
+                new 
+                {
+                    Id = 2,
+                    FullName = "Maria Kovalenko",
+                    Username = "maria_kov",
+                    Password = "password",
+                    Role = VetClassLibrary.Model.User.UserRoles.Client,
+                    Email = "maria@example.com",
+                    PhoneNumber = "+380674445566",
+                    CartId = 2,
+                    Address = "Lviv, Franko, 25"
+                }
+            );
 
-            //// 4. Сидирование визитов (Visits)
-            //modelBuilder.Entity<Visit>().HasData(
-                //// Завершенный визит (Completed)
-                //new Visit
-                //{
-                    //Id = 1,
-                    //PatientId = 1, // Кот Барсик
-                    //VisitDate = new DateTime(2023, 10, 15, 10, 0, 0),
-                    //Status = VisitStatus.Completed,
-                    //ReasonForVisit = "Щорічна вакцинація",
-                    //ObjectiveExam = "Температура 38.5, слизові рожеві.",
-                    //Diagnosis = "Клінічно здоровий",
-                    //Treatment = "Вакцина Nobivac Tricat",
-                    //Recommendations = "Спостереження 24 години"
-                //},
-                //// Запланированный визит в будущем (Planned)
-                //new Visit
-                //{
-                    //Id = 2,
-                    //PatientId = 2, // Собака Рекс
-                    //VisitDate = new DateTime(2025, 12, 1, 14, 30, 0),
-                    //Status = VisitStatus.Planned,
-                    //ReasonForVisit = "Профілактичний огляд",
-                    //Diagnosis = ""
-                //},
-                //// Просроченный визит (Planned, но дата в прошлом - попадет в IsOverdue)
-                //new Visit
-                //{
-                    //Id = 3,
-                    //PatientId = 3, // Кошка Мурка
-                    //VisitDate = new DateTime(2023, 11, 10, 9, 0, 0),
-                    //Status = VisitStatus.Planned,
-                    //ReasonForVisit = "Стерилізація",
-                    //Diagnosis = ""
-                //},
-                //// Отмененный визит (Canceled)
-                //new Visit
-                //{
-                    //Id = 4,
-                    //PatientId = 1, // Кот Барсик
-                    //VisitDate = new DateTime(2023, 12, 5, 11, 0, 0),
-                    //Status = VisitStatus.Canceled,
-                    //ReasonForVisit = "Консультація щодо харчування",
-                    //Diagnosis = ""
-                //}
-            //);
+            // 4. Sellers
+            modelBuilder.Entity<Seller>().HasData(
+                new 
+                {
+                    Id = 3,
+                    FullName = "Tech Seller",
+                    Username = "tech_seller",
+                    Password = "password",
+                    Role = VetClassLibrary.Model.User.UserRoles.Seller,
+                    Email = "seller@techstore.com",
+                    PhoneNumber = "+380991122334"
+                },
+                new 
+                {
+                    Id = 4,
+                    FullName = "Fashion Seller",
+                    Username = "fashion_seller",
+                    Password = "password",
+                    Role = VetClassLibrary.Model.User.UserRoles.Seller,
+                    Email = "seller@fashion.com",
+                    PhoneNumber = "+380995544332"
+                }
+            );
 
-            //// 5. Сидирование товаров (Goods)
-            //modelBuilder.Entity<Good>().HasData(
-                //new Good
-                //{
-                    //Id = 1,
-                    //Name = "Корм Royal Canin 1кг",
-                    //Price = 350.0,
-                    //BarCode = "1234567890123",
-                    //ImagePath = "ea1e8279-a9f3-4507-8a21-bc305021f04c.jpg" // Инициализируем пустым массивом
-                //},
-                //new Good
-                //{
-                    //Id = 2,
-                    //Name = "Нашийник від бліх",
-                    //Price = 150.0,
-                    //BarCode = "9876543210987",
-                    //ImagePath = "bfe5860a-aa48-49a5-bbad-2dcb390ab85e.jpg"
-                //}
-            //);
+            // 5. Companies
+            modelBuilder.Entity<Company>().HasData(
+                new 
+                {
+                    Id = 1,
+                    Name = "Tech Store",
+                    Description = "Best electronics",
+                    Address = "Kyiv, Tech St, 1",
+                    PhoneNumber = "+380991122334",
+                    Email = "contact@techstore.com",
+                    OwnerId = 3,
+                    ShippingCompanies = new List<string>()
+                },
+                new 
+                {
+                    Id = 2,
+                    Name = "Fashion Boutique",
+                    Description = "Trendy clothing",
+                    Address = "Lviv, Fashion Ave, 2",
+                    PhoneNumber = "+380995544332",
+                    Email = "contact@fashion.com",
+                    OwnerId = 4,
+                    ShippingCompanies = new List<string>()
+                }
+            );
 
-            //// 6. Сидирование услуг (Services)
-            //// Id продолжают нумерацию, так как Service и Good делят одну таблицу Items
-            //modelBuilder.Entity<Service>().HasData(
-                //new Service
-                //{
-                    //Id = 3,
-                    //Name = "Первинний огляд",
-                    //Price = 400.0,
-                    //Description = "Базовий огляд тварини лікарем-терапевтом"
-                //},
-                //new Service
-                //{
-                    //Id = 4,
-                    //Name = "Вакцинація комплексна",
-                    //Price = 250.0,
-                    //Description = "Щеплення полівалентною вакциною"
-                //}
-            //);
+            // 6. Items (Products)
+            modelBuilder.Entity<Item>().HasData(
+                new 
+                {
+                    Id = 1,
+                    Name = "Smartphone XYZ",
+                    Description = "Latest model smartphone",
+                    Price = 999.99m,
+                    DiscountPrice = 899.99m,
+                    CategoryId = 1,
+                    CompanyId = 1,
+                    IsDeleted = false,
+                    ImageUrls = new List<string>()
+                },
+                new 
+                {
+                    Id = 2,
+                    Name = "Laptop Pro",
+                    Description = "High performance laptop",
+                    Price = 1500.00m,
+                    DiscountPrice = 1400.00m,
+                    CategoryId = 1,
+                    CompanyId = 1,
+                    IsDeleted = false,
+                    ImageUrls = new List<string>()
+                },
+                new 
+                {
+                    Id = 3,
+                    Name = "Cotton T-Shirt",
+                    Description = "Comfortable cotton t-shirt",
+                    Price = 20.00m,
+                    DiscountPrice = 15.00m,
+                    CategoryId = 2,
+                    CompanyId = 2,
+                    IsDeleted = false,
+                    ImageUrls = new List<string>()
+                }
+            );
 
-            // 7. Сидирование склада (StorageItems)
-            // Используем анонимный тип для заполнения теневого внешнего ключа ItemId
+            // 7. StorageItems
             modelBuilder.Entity<StorageItem>().HasData(
-                new { Id = 1, ItemId = 1, Qty = 50.0 }, // Ссылается на Корм Royal Canin (Good Id = 1)
-                new { Id = 2, ItemId = 2, Qty = 20.0 }  // Ссылается на Нашийник (Good Id = 2)
+                new { Id = 1, ItemId = 1, Qty = 50.0 },
+                new { Id = 2, ItemId = 2, Qty = 30.0 },
+                new { Id = 3, ItemId = 3, Qty = 100.0 }
+            );
+
+            // 8. Orders
+            modelBuilder.Entity<Order>().HasData(
+                new 
+                {
+                    Id = 1,
+                    Date = new DateTime(2026, 6, 1, 10, 0, 0),
+                    CompanyId = 1,
+                    ClientId = 1,
+                    IsPaid = true,
+                    TransactionId = 12345,
+                    IsPerformed = false,
+                    Status = OrderStatus.Shipped
+                },
+                new 
+                {
+                    Id = 2,
+                    Date = new DateTime(2026, 6, 5, 14, 30, 0),
+                    CompanyId = 2,
+                    ClientId = 2,
+                    IsPaid = false,
+                    TransactionId = 0,
+                    IsPerformed = false,
+                    Status = OrderStatus.Pending
+                }
+            );
+
+            // 9. CartItems
+            modelBuilder.Entity<CartItem>().HasData(
+                new { Id = 1, ProductId = 1, Quantity = 1.0, OrderId = 1 },
+                new { Id = 2, ProductId = 2, Quantity = 2.0, OrderId = 1 },
+                new { Id = 3, ProductId = 3, Quantity = 3.0, OrderId = 2 }
             );
         }
     }
