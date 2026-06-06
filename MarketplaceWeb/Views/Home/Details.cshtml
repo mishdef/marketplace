@@ -1,0 +1,23 @@
+@model VetClassLibrary.Model.Item
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-2">
+        <button class="btn btn-secondary mb-3" onclick="history.back()">&larr; Back</button>
+        
+    </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <img src="@Model.ImageUrls.FirstOrDefault()" alt="Alternate Text" />
+        </div>
+        <div class="col-8">
+            <h1>@Model.Name</h1>
+            <p>@Model.Description</p>
+            <p><strong>Price: </strong> $@Model.Price</p>
+        </div>
+    </div>
+</div>

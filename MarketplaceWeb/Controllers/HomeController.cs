@@ -23,6 +23,16 @@ namespace MarketplaceWeb.Controllers
             return View(items);
         }
 
+        public IActionResult Details(int id)
+        {
+            var item = _itemService.GetById(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            return View(item);
+        }
+
         public IActionResult Privacy()
         {
             return View();
