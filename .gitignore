@@ -290,6 +290,7 @@ tramp
 # cask packages
 .cask/
 dist/
+!wwwroot/lib/**/dist/
 
 # Flycheck
 flycheck_*.el
