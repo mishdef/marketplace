@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -27,6 +27,15 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
+                    <form class="d-flex ms-auto me-3" asp-controller="Home" asp-action="Search" method="get">
+                        <input class="form-control me-2"
+                               type="search"
+                               name="query"
+                               placeholder="Search items..."
+                               aria-label="Search"
+                               value="@Context.Request.Query["query"]" />
+                        <button class="btn btn-outline-success" type="submit">Search</button>
+                    </form>
                     <partial name="_LoginPartial" />
                 </div>
             </div>

@@ -1,0 +1,34 @@
+@model List<VetClassLibrary.Model.Item>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-3">
+            <h1 class="my-4">Marketplace</h1>
+        </div>
+        <div class="col-9">
+            <div class="container">
+                <div class="alert alert-info" role="alert">
+                    @if (Model.Count == 0)
+                    {
+                        <span>No items found for your search.</span>
+                    }
+                    else
+                    {
+                        <span>Found @Model.Count item(s) matching your search.</span>
+                    }
+                </div>
+            <div class="row">
+                @foreach (var item in Model)
+                {
+                    <component type="typeof(MarketplaceWeb.Components.ItemCard)"
+                               render-mode="Static"
+                               param-Item="item" />
+                }
+            </div>
+            </div>
+        </div>
+    </div>
+</div>

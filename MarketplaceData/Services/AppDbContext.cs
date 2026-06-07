@@ -140,6 +140,7 @@ namespace VetClassLibrary.Services
                     PhoneNumber = "+380991122334",
                     Email = "contact@techstore.com",
                     OwnerId = 3,
+                    LogoUrl = "/images/logo1.jpg",
                     ShippingCompanies = new List<string>()
                 },
                 new 
@@ -151,6 +152,7 @@ namespace VetClassLibrary.Services
                     PhoneNumber = "+380995544332",
                     Email = "contact@fashion.com",
                     OwnerId = 4,
+                    LogoUrl = "/images/logo2.jpg",
                     ShippingCompanies = new List<string>()
                 }
             );
@@ -167,7 +169,7 @@ namespace VetClassLibrary.Services
                     CategoryId = 1,
                     CompanyId = 1,
                     IsDeleted = false,
-                    ImageUrls = new List<string>()
+                    ImageUrls = new List<string>() { "/images/1.png" }
                 },
                 new 
                 {
@@ -179,7 +181,7 @@ namespace VetClassLibrary.Services
                     CategoryId = 1,
                     CompanyId = 1,
                     IsDeleted = false,
-                    ImageUrls = new List<string>()
+                    ImageUrls = new List<string>() { "/images/2.png" }
                 },
                 new 
                 {
@@ -191,7 +193,7 @@ namespace VetClassLibrary.Services
                     CategoryId = 2,
                     CompanyId = 2,
                     IsDeleted = false,
-                    ImageUrls = new List<string>()
+                    ImageUrls = new List<string>() { "/images/3.png" }
                 }
             );
 

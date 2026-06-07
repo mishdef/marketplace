@@ -7,8 +7,8 @@ namespace Domain
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly AppDbContext _context;
-        private readonly DbSet<T> _dbSet;
+        protected readonly AppDbContext _context;
+        protected readonly DbSet<T> _dbSet;
 
         public Repository(AppDbContext context)
         {
@@ -18,7 +18,7 @@ namespace Domain
 
         public virtual IEnumerable<T> GetAll() => _dbSet.ToList();
 
-        public T? GetById(int id)
+        public virtual T? GetById(int id)
         {
             var entity = _dbSet.Find(id);
             if (entity == null)
@@ -26,18 +26,18 @@ namespace Domain
             return entity;
         }
 
-        public void Create(T item) { 
+        public virtual void Create(T item) { 
             _dbSet.Add(item);
             _context.SaveChanges();
         }
 
-        public void Update(T item)
+        public virtual void Update(T item)
         {
             _dbSet.Update(item);
             _context.SaveChanges();
         }
 
-        public void Delete(int id)
+        public virtual void Delete(int id)
         {
             T? entity = _dbSet.Find(id);
             if (entity != null)
@@ -49,29 +49,29 @@ namespace Domain
                 throw new KeyNotFoundException("Entity not found.");
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public virtual async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<T?> GetByIdAsync(int id)
+        public virtual async Task<T?> GetByIdAsync(int id)
         {
             return await _dbSet.FindAsync(id);
         }
 
-        public async Task CreateAsync(T item)
+        public virtual async Task CreateAsync(T item)
         {
             await _dbSet.AddAsync(item);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(T item)
+        public virtual async Task UpdateAsync(T item)
         {
             _dbSet.Update(item);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public virtual async Task DeleteAsync(int id)
         {
             var entity = await _dbSet.FindAsync(id);
             if (entity != null)

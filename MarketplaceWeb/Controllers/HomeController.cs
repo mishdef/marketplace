@@ -33,6 +33,12 @@ namespace MarketplaceWeb.Controllers
             return View(item);
         }
 
+        public IActionResult Search(string query)
+        {
+            var items = _itemService.Search(query);
+            return View(items);
+        }
+
         public IActionResult Privacy()
         {
             return View();

@@ -8,25 +8,17 @@
         <div class="col-3">
             <h1 class="my-4">Marketplace</h1>
         </div>
-        @foreach (var item in Model)
-        {
-            <div class="col-md-3">
-                <div class="card mb-4 shadow-sm" style="cursor: pointer;" onclick="location.href='@Url.Action("Details", "Home", new { id = item.Id })'">
-                    <img src="@(item.ImageUrls?.Any() == true ? item.ImageUrls[0] : "https://via.placeholder.com/300x200?text=No+Image")" class="card-img-top" alt="@item.Name">
-                    <div class="card-body">
-                        <h5 class="card-title
-                            ">
-                            @item.Name
-                        </h5>
-                        <p class="card-text">
-                            @item.Description
-                        </p>
-                        <p class="card-text text-end">
-                            <strong>Price: </strong> $@item.Price
-                        </p>
-                    </div>
+        <div class="col-9">
+            <div class="container">
+                <div class="row">
+                    @foreach (var item in Model)
+                    {
+                        <component type="typeof(MarketplaceWeb.Components.ItemCard)"
+                                   render-mode="Static"
+                                   param-Item="item" />
+                    }
                 </div>
             </div>
-        }
+        </div>
     </div>
 </div>
