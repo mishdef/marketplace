@@ -19,7 +19,7 @@
             <p>@Model.Description</p>
             <p><strong>Price: </strong> $@Model.Price</p>
         </div>
-        <div class="card mt-4 p-3 shadow-sm">
+        <a class="card mt-4 p-3 shadow-sm" style="text-decoration: none;" href="@Url.Action("Company", "Home", new { id = Model.CompanyId })">
             <div class="card-body p-0">
                 <div class="d-flex align-items-center">
                     <div class="me-3" style="flex-shrink: 0;">
@@ -34,6 +34,6 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
 </div>

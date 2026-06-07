@@ -1,0 +1,40 @@
+@using MarketplaceData.Model.User
+@model Company
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-2">
+        <button class="btn btn-secondary" onclick="history.back()">&larr; Back</button>
+        
+    </div>
+    </div>
+    <div class="row">
+        <div class="card my-4 p-3 shadow-sm">
+            <div class="card-body p-0">
+                <div class="d-flex align-items-center">
+                    <div class="me-3" style="flex-shrink: 0;">
+                        <img class="rounded-circle border shadow-sm"
+                             src="@Model.LogoUrl"
+                             alt="Logo"
+                             style="width: 60px !important; height: 60px !important; min-width: 60px; min-height: 60px; object-fit: cover; display: block;" />
+                    </div>
+                    <div>
+                        <h3 class="h5 mb-1">@Model.Name</h3>
+                        <p class="text-muted mb-0" style="font-size: 0.9rem;">@Model.Description</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        @foreach (var item in Model.StoreItems)
+        {
+            <component type="typeof(MarketplaceWeb.Components.ItemCard)"
+                       render-mode="Static"
+                       param-Item="item" />
+        }
+    </div>
+</div>

@@ -1,5 +1,6 @@
 using MarketplaceData.Interfaces;
 using MarketplaceWeb.Data;
+using MarketplaceWeb.DTO;
 using MarketplaceWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -10,17 +11,26 @@ namespace MarketplaceWeb.Controllers
     public class HomeController : Controller
     {
         private readonly IItemService _itemService;
+        private readonly ICompanyService _companyService;
+        private readonly ICategoryService _categoryService;
 
-        public HomeController(IItemService itemService)
+        public HomeController(IItemService itemService, ICompanyService companyService, ICategoryService categoryService)
         {
             _itemService = itemService;
+            _companyService = companyService;
+            _categoryService = categoryService;
         }
 
         public IActionResult Index()
         {
             var items = _itemService.GetAll();
 
-            return View(items);
+            return View(
+                new IndexViewModel
+                {
+                    Items = items.ToList(),
+                    Categories = _categoryService.GetCategories()
+                });
         }
 
         public IActionResult Details(int id)
@@ -37,6 +47,30 @@ namespace MarketplaceWeb.Controllers
         {
             var items = _itemService.Search(query);
             return View(items);
+        }
+
+
+        public IActionResult Company(int id)
+        {
+            var company = _companyService.GetById(id);
+
+            return View(company);
+        }
+
+        public IActionResult Category(int id)
+        {
+            var category = _categoryService.GetById(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            return View(
+                new CategoryViewModel 
+                { 
+                    Category = category, 
+                    Items = category.Items, 
+                    Categories = category.SubCategories.ToList() 
+                });
         }
 
         public IActionResult Privacy()
