@@ -1,21 +1,19 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Identity;
 using VetClassLibrary.Model.User;
 
 namespace MarketplaceData.Model.User
 {
-    public abstract class UserBase
+    public abstract class UserBase : IdentityUser<int>
     {
         private string _role = UserRoles.Client;
         private string _fullName = null!;
-        private string _username = null!;
         private string _password = null!;
-        private string _email = null!;
-        private string _phoneNumber = null!;
 
-        public int Id { get; set; }
         public string FullName
         {
             get { return _fullName; }
@@ -33,9 +31,10 @@ namespace MarketplaceData.Model.User
             }
         }
 
+        [NotMapped]
         public string Username
         {
-            get { return _username; }
+            get { return UserName ?? string.Empty; }
             set
             {
                 if (value.Length < 3)
@@ -46,7 +45,7 @@ namespace MarketplaceData.Model.User
                 {
                     throw new ArgumentException("Username must be at most 20 characters long");
                 }
-                _username = value;
+                UserName = value;
             }
         }
 
@@ -79,30 +78,31 @@ namespace MarketplaceData.Model.User
             }
         }
 
-        public string Email
+        public override string? Email
         {
-            get { return _email; }
+            get { return base.Email; }
             set
             {
-                if (!Regex.IsMatch(value, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                if (value != null && !Regex.IsMatch(value, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
                 {
                     throw new ArgumentException("Email must be a valid email address");
                 }
-                _email = value;
+                base.Email = value;
             }
         }
 
-        public string PhoneNumber
+        public override string? PhoneNumber
         {
-            get { return _phoneNumber; }
+            get { return base.PhoneNumber; }
             set
             {
-                if (!Regex.IsMatch(value, @"^\+?[0-9]{7,15}$"))
+                if (value != null && !Regex.IsMatch(value, @"^\+?[0-9]{7,15}$"))
                 {
                     throw new ArgumentException("Phone number must be a valid phone number with 7 to 15 digits, optionally starting with '+'");
                 }
-                _phoneNumber = value;
+                base.PhoneNumber = value;
             }
         }
     }
 }
+

@@ -1,6 +1,7 @@
 using MarketplaceData.Model;
 using MarketplaceData.Model.Cart;
 using MarketplaceData.Model.User;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -10,11 +11,13 @@ using VetClassLibrary.Model.Storage;
 using VetClassLibrary.Model.User;
 namespace VetClassLibrary.Services
 {
-    public class AppDbContext :  IdentityDbContext
+    public class AppDbContext :  IdentityDbContext<UserBase, IdentityRole<int>, int>
     {
         private readonly string _connectionString;
 
-        public DbSet<Client> Users { get; set; }
+        public DbSet<Client> Clients { get; set; }
+        public DbSet<Seller> Sellers { get; set; }
+        public DbSet<Admin> Admins { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Item> Products { get; set; }
@@ -47,8 +50,13 @@ namespace VetClassLibrary.Services
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<UserBase>()
+                .HasDiscriminator<string>("UserType")
+                .HasValue<Client>("Client")
+                .HasValue<Seller>("Seller")
+                .HasValue<Admin>("Admin");
 
-            modelBuilder.Entity<Client>().HasIndex(u => u.Username).IsUnique();
+            modelBuilder.Entity<Client>().HasIndex(u => u.UserName).IsUnique();
 
             modelBuilder.Entity<Company>()
                 .HasOne(c => c.Owner)
@@ -70,6 +78,13 @@ namespace VetClassLibrary.Services
             //// ==========================================
             //// SEED DATA (Начальные данные)
             //// ==========================================
+
+            // 0. Roles
+            modelBuilder.Entity<IdentityRole<int>>().HasData(
+                new IdentityRole<int> { Id = 1, Name = "Client", NormalizedName = "CLIENT", ConcurrencyStamp = "e9a03975-d142-4911-ad81-bd484e5a953e" },
+                new IdentityRole<int> { Id = 2, Name = "Seller", NormalizedName = "SELLER", ConcurrencyStamp = "81ba576a-54e4-4d8b-967a-8b8df2839958" },
+                new IdentityRole<int> { Id = 3, Name = "Admin", NormalizedName = "ADMIN", ConcurrencyStamp = "5c52c6f1-a1e6-42d4-8d4e-1282be389812" }
+            );
 
             // 1. Categories
             modelBuilder.Entity<Category>().HasData(
@@ -96,25 +111,45 @@ namespace VetClassLibrary.Services
                 {
                     Id = 1,
                     FullName = "Ivan Petrenko",
-                    Username = "ivan_petr",
+                    UserName = "ivan_petr",
+                    NormalizedUserName = "IVAN_PETR",
                     Password = "password",
                     Role = VetClassLibrary.Model.User.UserRoles.Client,
                     Email = "ivan@example.com",
+                    NormalizedEmail = "IVAN@EXAMPLE.COM",
                     PhoneNumber = "+380501112233",
                     CartId = 1,
-                    Address = "Kyiv, Khreshchatyk, 1"
+                    Address = "Kyiv, Khreshchatyk, 1",
+                    EmailConfirmed = true,
+                    PhoneNumberConfirmed = true,
+                    TwoFactorEnabled = false,
+                    LockoutEnabled = true,
+                    AccessFailedCount = 0,
+                    SecurityStamp = "d6e3557e-77cc-44a5-bdf9-2ba831ec41e1",
+                    ConcurrencyStamp = "a7b7a2d1-5db8-4034-8c81-4235e197c36a",
+                    UserType = "Client"
                 },
                 new 
                 {
                     Id = 2,
                     FullName = "Maria Kovalenko",
-                    Username = "maria_kov",
+                    UserName = "maria_kov",
+                    NormalizedUserName = "MARIA_KOV",
                     Password = "password",
                     Role = VetClassLibrary.Model.User.UserRoles.Client,
                     Email = "maria@example.com",
+                    NormalizedEmail = "MARIA@EXAMPLE.COM",
                     PhoneNumber = "+380674445566",
                     CartId = 2,
-                    Address = "Lviv, Franko, 25"
+                    Address = "Lviv, Franko, 25",
+                    EmailConfirmed = true,
+                    PhoneNumberConfirmed = true,
+                    TwoFactorEnabled = false,
+                    LockoutEnabled = true,
+                    AccessFailedCount = 0,
+                    SecurityStamp = "f6fbb5de-75cc-44e2-a0e1-0bc51a2dcd22",
+                    ConcurrencyStamp = "b86300df-b118-4ee0-8ba0-0be157ba8d6c",
+                    UserType = "Client"
                 }
             );
 
@@ -124,21 +159,41 @@ namespace VetClassLibrary.Services
                 {
                     Id = 3,
                     FullName = "Tech Seller",
-                    Username = "tech_seller",
+                    UserName = "tech_seller",
+                    NormalizedUserName = "TECH_SELLER",
                     Password = "password",
                     Role = VetClassLibrary.Model.User.UserRoles.Seller,
                     Email = "seller@techstore.com",
-                    PhoneNumber = "+380991122334"
+                    NormalizedEmail = "SELLER@TECHSTORE.COM",
+                    PhoneNumber = "+380991122334",
+                    EmailConfirmed = true,
+                    PhoneNumberConfirmed = true,
+                    TwoFactorEnabled = false,
+                    LockoutEnabled = true,
+                    AccessFailedCount = 0,
+                    SecurityStamp = "96d7cfbb-7ac1-4322-9e90-c11efeb9e2d3",
+                    ConcurrencyStamp = "4c3b5d3c-d6a0-4ff6-8c4d-8cfbc1fcf3b2",
+                    UserType = "Seller"
                 },
                 new 
                 {
                     Id = 4,
                     FullName = "Fashion Seller",
-                    Username = "fashion_seller",
+                    UserName = "fashion_seller",
+                    NormalizedUserName = "FASHION_SELLER",
                     Password = "password",
                     Role = VetClassLibrary.Model.User.UserRoles.Seller,
                     Email = "seller@fashion.com",
-                    PhoneNumber = "+380995544332"
+                    NormalizedEmail = "SELLER@FASHION.COM",
+                    PhoneNumber = "+380995544332",
+                    EmailConfirmed = true,
+                    PhoneNumberConfirmed = true,
+                    TwoFactorEnabled = false,
+                    LockoutEnabled = true,
+                    AccessFailedCount = 0,
+                    SecurityStamp = "2a8e8419-86ab-4cb7-a70d-c07adcd515df",
+                    ConcurrencyStamp = "a11d8c1c-43f1-433b-b72e-d01df4fce3f7",
+                    UserType = "Seller"
                 }
             );
 

@@ -1,4 +1,4 @@
-﻿using VetClassLibrary.Interfaces;
+using VetClassLibrary.Interfaces;
 using VetClassLibrary.Model.User;
 using System;
 using System.Collections.Generic;
@@ -22,7 +22,7 @@ namespace VetClassLibrary.Services
                 throw new ArgumentException("Username and password are required.");
             }
 
-            var user = _context.Users.FirstOrDefault(u => u.Username == username && u.Password == password);
+            var user = _context.Users.OfType<Client>().FirstOrDefault(u => u.UserName == username && u.Password == password);
             if (user == null)
             {
                 throw new ArgumentException("Invalid username or password.");

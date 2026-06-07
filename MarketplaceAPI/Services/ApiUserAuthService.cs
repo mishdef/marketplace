@@ -1,4 +1,4 @@
-﻿ using Microsoft.EntityFrameworkCore;
+ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using VetClassLibrary.DTO;
 using System.IdentityModel.Tokens.Jwt;
@@ -73,14 +73,14 @@ namespace VetAPI.Services
 
         public async Task<bool> IsUserExistsAsync(string username)
         {
-            return await _context.Users.AnyAsync(u => u.Username.ToLower() == username.ToLower());
+            return await _context.Users.AnyAsync(u => u.UserName != null && u.UserName.ToLower() == username.ToLower());
         }
 
         public async Task<UserLoginResponceDTO?> LoginAsync(UserLoginRequestDTO loginRequestDTO)
         {
             try
             {
-                var user = (await _userService.GetAllAsync()).FirstOrDefault(u => u.Username.ToLower() == loginRequestDTO.Username.ToLower());
+                var user = (await _userService.GetAllAsync()).FirstOrDefault(u => u.UserName != null && u.UserName.ToLower() == loginRequestDTO.Username.ToLower());
 
                 if (user == null || user.Password != loginRequestDTO.Password)
                 {
@@ -124,6 +124,9 @@ namespace VetAPI.Services
                 user.PhoneNumber = dto.PhoneNumber;
                 user.Password = dto.Password;
                 user.Role = dto.Role;
+                user.UserName = dto.PhoneNumber;
+                user.NormalizedUserName = dto.PhoneNumber.ToUpper();
+                user.SecurityStamp = Guid.NewGuid().ToString();
 
                 await _userService.CreateAsync(user);
 
