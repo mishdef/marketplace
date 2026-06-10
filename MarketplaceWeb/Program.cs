@@ -1,15 +1,18 @@
 using MarketplaceData.Interfaces;
-using MarketplaceData.Services;
 using MarketplaceData.Model.User;
+using MarketplaceData.Services;
 using MarketplaceWeb.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Stripe;
 using VetClassLibrary.Interfaces;
 using VetClassLibrary.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -50,7 +53,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 
+
 var app = builder.Build();
+
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 using (var scope = app.Services.CreateScope())
 {
