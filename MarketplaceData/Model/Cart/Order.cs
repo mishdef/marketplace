@@ -9,9 +9,11 @@ namespace MarketplaceData.Model.Cart
     public class Order
     {
         public int Id { get; set; }
-        public IEnumerable<CartItem> CartItems { get; set; } = new List<CartItem>();
+        public IEnumerable<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
         public DateTime Date { get; set; }
+
+        public decimal Total { get; set; }
 
 
         public int CompanyId { get; set; }

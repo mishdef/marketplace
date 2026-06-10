@@ -70,7 +70,7 @@ namespace MarketplaceWeb.Controllers
                 }
             }
             
-            var storageItems = _storageService.GetStorageItems();
+            var storageItems = _storageService.GetStorageItems(item.CompanyId);
             var storageItem = storageItems.FirstOrDefault(s => s.ItemId == id);
             ViewBag.AvailableQuantity = storageItem?.Qty ?? 0;
 

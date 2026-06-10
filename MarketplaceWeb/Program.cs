@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Stripe;
 using VetClassLibrary.Interfaces;
+using VetClassLibrary.Model.OrderProcessors;
 using VetClassLibrary.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,7 +53,10 @@ builder.Services.AddScoped<IStorageService, StorageService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
+
+builder.Services.AddScoped<IOrderProcessor, ItemOrderProcessor>();
 
 var app = builder.Build();
 

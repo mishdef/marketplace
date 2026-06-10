@@ -52,10 +52,10 @@
                                 </a>
                             </li>
                         }
-                        @if (User.IsInRole("Admin"))
+                        @if (User.IsInRole("Client") || User.IsInRole("Admin") || User.IsInRole("Seller"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Admin Dashboard</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Client" asp-action="Index">Client Dashboard</a>
                             </li>
                         }
                         @if (User.IsInRole("Seller"))
@@ -64,9 +64,12 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Seller" asp-action="Index">Seller Dashboard</a>
                             </li>
                         }
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Admin Dashboard</a>
+                            </li>
+                        }
                     </ul>
                     <form class="d-flex ms-auto me-3" asp-controller="Home" asp-action="Search" method="get">
                         <input class="form-control me-2"

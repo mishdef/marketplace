@@ -1,0 +1,88 @@
+@model List<VetClassLibrary.Model.Storage.StorageItem>
+
+@{
+    ViewData["Title"] = "Manage Storage";
+    int companyId = ViewBag.CompanyId;
+    string companyName = ViewBag.CompanyName;
+}
+
+<div class="container mt-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-3">
+            <li class="breadcrumb-item"><a asp-controller="Seller" asp-action="Index">Seller Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Manage Storage</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Manage Storage for @companyName</h1>
+        <a asp-controller="Seller" asp-action="Index" class="btn btn-outline-secondary">Back to Dashboard</a>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            There are no items in storage for this company. Add items to your shop first.
+        </div>
+    }
+    else
+    {
+        <form asp-controller="Seller" asp-action="UpdateStorageQty" method="post">
+            <input type="hidden" name="companyId" value="@companyId" />
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Item Image</th>
+                                    <th>Item Name</th>
+                                    <th>Description</th>
+                                    <th style="width: 200px;">Quantity in Stock</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @if (item.Item.ImageUrls != null && item.Item.ImageUrls.Any())
+                                            {
+                                                <img src="@item.Item.ImageUrls.FirstOrDefault()" alt="@item.Item.Name" style="max-height: 50px; max-width: 50px;" class="img-thumbnail" />
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-light text-center rounded border" style="width: 50px; height: 50px; line-height: 50px;">
+                                                    <small class="text-muted">No Img</small>
+                                                </div>
+                                            }
+                                        </td>
+                                        <td class="fw-bold">@item.Item.Name</td>
+                                        <td>
+                                            <span class="d-inline-block text-truncate" style="max-width: 250px;">
+                                                @item.Item.Description
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="input-group input-group-sm">
+                                                <input type="number" 
+                                                       name="quantities[@item.Id]" 
+                                                       value="@item.Qty" 
+                                                       class="form-control" 
+                                                       min="0" 
+                                                       step="any" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-white text-end">
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                </div>
+            </div>
+        </form>
+    }
+</div>

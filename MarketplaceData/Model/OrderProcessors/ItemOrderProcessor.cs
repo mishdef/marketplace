@@ -6,11 +6,11 @@ using System.Text;
 
 namespace VetClassLibrary.Model.OrderProcessors
 {
-    public class GoodItemOrderProcessor : IOrderProcessor
+    public class ItemOrderProcessor : IOrderProcessor
     {
         private readonly IStorageService _storageService;
 
-        public GoodItemOrderProcessor(IStorageService storageService)
+        public ItemOrderProcessor(IStorageService storageService)
         {
             _storageService = storageService;
         }

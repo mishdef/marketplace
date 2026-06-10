@@ -11,7 +11,7 @@ namespace VetClassLibrary.Interfaces
         Item UpdateQty(int id, double qty);
         StorageItem UpdateQty(Item item, double qty);
         StorageItem GetStorageItemById(int id);
-        List<StorageItem> GetStorageItems();
+        List<StorageItem> GetStorageItems(int companyId);
         double GetQty(int id);
         double GetQty(Item item);
         void InitalizeNewItem(Item item);

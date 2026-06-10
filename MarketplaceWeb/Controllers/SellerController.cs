@@ -19,17 +19,20 @@ namespace MarketplaceWeb.Controllers
         private readonly ICompanyService _companyService;
         private readonly UserManager<User> _userManager;
         private readonly IPicturesService _picturesService;
+        private readonly IStorageService _storageService;
 
         public SellerController(
             ISellerService sellerService, 
             ICompanyService companyService, 
             UserManager<User> userManager,
-            IPicturesService picturesService)
+            IPicturesService picturesService,
+            IStorageService storageService)
         {
             _sellerService = sellerService;
             _companyService = companyService;
             _userManager = userManager;
             _picturesService = picturesService;
+            _storageService = storageService;
         }
 
         [Authorize(Roles = "Seller")]
@@ -179,6 +182,58 @@ namespace MarketplaceWeb.Controllers
             }
 
             return View(model);
+        }
+        [HttpGet]
+        public IActionResult ManageStorage(int companyId)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId)) return Unauthorized();
+
+            var company = _companyService.GetById(companyId);
+            if (company == null) return NotFound();
+
+            var seller = _sellerService.GetAll().FirstOrDefault(s => s.UserId == userId);
+            bool isOwner = company.OwnerId == userId;
+            bool isEmployee = seller != null && seller.CompanyId == companyId;
+            if (!isOwner && !isEmployee) return Forbid();
+
+            var storageItems = _storageService.GetStorageItems(companyId);
+            ViewBag.CompanyId = companyId;
+            ViewBag.CompanyName = company.Name;
+            return View(storageItems);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateStorageQty(System.Collections.Generic.Dictionary<int, double> quantities, int companyId)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId)) return Unauthorized();
+
+            var company = _companyService.GetById(companyId);
+            if (company == null) return NotFound();
+
+            var seller = _sellerService.GetAll().FirstOrDefault(s => s.UserId == userId);
+            bool isOwner = company.OwnerId == userId;
+            bool isEmployee = seller != null && seller.CompanyId == companyId;
+            if (!isOwner && !isEmployee) return Forbid();
+
+            if (quantities != null)
+            {
+                foreach (var kvp in quantities)
+                {
+                    try
+                    {
+                        _storageService.UpdateQty(kvp.Key, kvp.Value);
+                    }
+                    catch (System.Exception)
+                    {
+                        // Ignore or handle missing items
+                    }
+                }
+            }
+
+            return RedirectToAction(nameof(ManageStorage), new { companyId = companyId });
         }
     }
 }

@@ -24,6 +24,7 @@ namespace VetClassLibrary.Services
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CompanyCart> CompanyCarts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<ClientViewedItem> ClientViewedItems { get; set; }
         public DbSet<Item> Products { get; set; }
         public DbSet<StorageItem> StorageItems { get; set; }
@@ -337,31 +338,6 @@ namespace VetClassLibrary.Services
                 new { Id = 20, ItemId = 20, Qty = 110.0 }
             );
 
-            // 8. Orders
-            modelBuilder.Entity<Order>().HasData(
-                new 
-                {
-                    Id = 1,
-                    Date = new DateTime(2026, 6, 1, 10, 0, 0),
-                    CompanyId = 1,
-                    ClientId = 1,
-                    IsPaid = true,
-                    TransactionId = 12345,
-                    IsPerformed = false,
-                    Status = OrderStatus.Shipped
-                },
-                new 
-                {
-                    Id = 2,
-                    Date = new DateTime(2026, 6, 5, 14, 30, 0),
-                    CompanyId = 2,
-                    ClientId = 2,
-                    IsPaid = false,
-                    TransactionId = 0,
-                    IsPerformed = false,
-                    Status = OrderStatus.Pending
-                }
-            );
 
 
 

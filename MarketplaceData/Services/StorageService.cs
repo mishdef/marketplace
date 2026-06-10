@@ -57,9 +57,9 @@ namespace VetClassLibrary.Services
             }
         }
 
-        public List<StorageItem> GetStorageItems()
+        public List<StorageItem> GetStorageItems(int companyId)
         {
-            return _db.StorageItems.Include(si => si.Item).Where(si => !si.Item.IsDeleted).ToList();
+            return _db.StorageItems.Include(si => si.Item).Where(si => !si.Item.IsDeleted && si.Item.CompanyId == companyId).ToList();
         }
 
         public void InitalizeNewItem(Item item)

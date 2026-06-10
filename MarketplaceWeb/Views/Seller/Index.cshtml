@@ -29,6 +29,7 @@
                 <h3 class="mb-0 text-primary">@Model.Name</h3>
                 <div>
                     <a asp-controller="ShopItems" asp-action="Index" class="btn btn-outline-info btn-sm me-2">Manage Items</a>
+                    <a asp-controller="Seller" asp-action="ManageStorage" asp-route-companyId="@Model.Id" class="btn btn-outline-warning btn-sm me-2">Manage Storage</a>
                     @if (isOwner)
                     {
                         <a asp-action="EditCompany" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">Edit Information</a>

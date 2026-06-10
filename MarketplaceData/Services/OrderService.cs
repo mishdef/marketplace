@@ -1,4 +1,4 @@
-﻿using VetClassLibrary.Interfaces;
+using VetClassLibrary.Interfaces;
 using VetClassLibrary.Model;
 using VetClassLibrary.Model.User;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +32,7 @@ namespace VetClassLibrary.Services
                 await _db.Orders.AddAsync(order);
                 await _db.SaveChangesAsync();
 
-                await ProcessItemsAsync(order.CartItems);
+                await ProcessItemsAsync(order.OrderItems);
             }
             else
             {
@@ -40,7 +40,7 @@ namespace VetClassLibrary.Services
             }
         }
 
-        public async Task ProcessItemsAsync(IEnumerable<CartItem> items)
+        public async Task ProcessItemsAsync(IEnumerable<OrderItem> items)
         {
             foreach (var item in items)
             {
@@ -60,9 +60,8 @@ namespace VetClassLibrary.Services
         {
             var query = _db.Orders
                 .Include(o => o.Client)
-                .Include(o => o.CartItems)
+                .Include(o => o.OrderItems)
                     .ThenInclude(i => i.Product)
-                .Include(o => o.CartItems)
                 .AsQueryable();
 
             if (startDate.HasValue)
@@ -76,6 +75,25 @@ namespace VetClassLibrary.Services
             }
 
             return await query.OrderByDescending(o => o.Date).ToListAsync();
+        }
+
+        public Task<List<Order>> GetOrdersByClientIdAsync(int clientId)
+        {
+            return _db.Orders
+                .Where(o => o.ClientId == clientId)
+                .Include(o => o.OrderItems)
+                .ThenInclude(i => i.Product)
+                .AsQueryable()
+                .ToListAsync();
+        }
+
+        public Task<Order?> GetOrderByIdAsync(int id)
+        {
+            return _db.Orders
+                .Include(o => o.OrderItems)
+                .ThenInclude(i => i.Product)
+                .Include(o => o.Company)
+                .FirstOrDefaultAsync(o => o.Id == id);
         }
     }
 }
