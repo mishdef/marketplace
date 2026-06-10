@@ -1,9 +1,10 @@
-﻿using VetClassLibrary.Model.User;
+using VetClassLibrary.Model.User;
+using MarketplaceData.Model.User;
 
 namespace VetClassLibrary.Interfaces
 {
     public interface IAuthService
     {
-        Client Login(string username, string password);
+        User Login(string username, string password);
     }
 }

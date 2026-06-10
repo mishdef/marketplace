@@ -1,4 +1,4 @@
-﻿using MarketplaceData.Model.User;
+using MarketplaceData.Model.User;
 using VetClassLibrary.Model.User;
 
 namespace VetClassLibrary.DTO
@@ -7,6 +7,6 @@ namespace VetClassLibrary.DTO
     {
         public string? Token { get; set; }
 
-        public UserBase? User { get; set; }
+        public User? User { get; set; }
     }
 }

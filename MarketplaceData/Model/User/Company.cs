@@ -1,4 +1,4 @@
-﻿using VetClassLibrary.Model;
+using VetClassLibrary.Model;
 
 namespace MarketplaceData.Model.User
 {
@@ -13,14 +13,14 @@ namespace MarketplaceData.Model.User
 
 
         public int OwnerId { get; set; }
-        public Seller Owner { get; set; } = null!;
+        public User Owner { get; set; } = null!;
 
 
         public string? LogoUrl { get; set; }
 
         public ICollection<string> ShippingCompanies { get; set; } = new List<string>();
 
-        public ICollection<Seller>? Employees { get; set; } = null!;
+        public ICollection<SellerInfo>? Employees { get; set; } = null!;
         public ICollection<Item>? StoreItems { get; set; } = null!;
     }
 }

@@ -32,5 +32,14 @@ namespace MarketplaceData.Services
                              .FirstOrDefault(c => c.Id == id);
             });
         }
+
+        public override IEnumerable<Company> GetAll()
+        {
+            return _dbSet.AsNoTracking()
+                         .Include(c => c.Owner)
+                         .Include(c => c.Employees)
+                         .Include(c => c.StoreItems)
+                         .ToList();
+        }
     }
 }

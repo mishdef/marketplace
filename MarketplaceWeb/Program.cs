@@ -17,7 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<UserBase>(options => options.SignIn.RequireConfirmedAccount = false)
+builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole<int>>()
     .AddEntityFrameworkStores<AppDbContext>();
 
@@ -42,12 +42,20 @@ builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IPicturesService, PicturesService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ISellerService, SellerService>();
+builder.Services.AddScoped<IStorageService, StorageService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
     var roles = new[] { VetClassLibrary.Model.User.UserRoles.Admin, VetClassLibrary.Model.User.UserRoles.Seller, VetClassLibrary.Model.User.UserRoles.Client };
     foreach (var role in roles)
     {
@@ -56,6 +64,18 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole<int>(role));
         }
     }
+
+    var admin = await userManager.FindByEmailAsync("admin@marketplace.com");
+    if (admin != null && !await userManager.IsInRoleAsync(admin, "Admin"))
+        await userManager.AddToRoleAsync(admin, "Admin");
+
+    var seller1 = await userManager.FindByEmailAsync("seller@techstore.com");
+    if (seller1 != null && !await userManager.IsInRoleAsync(seller1, "Seller"))
+        await userManager.AddToRoleAsync(seller1, "Seller");
+
+    var seller2 = await userManager.FindByEmailAsync("seller@fashion.com");
+    if (seller2 != null && !await userManager.IsInRoleAsync(seller2, "Seller"))
+        await userManager.AddToRoleAsync(seller2, "Seller");
 }
 
 // Configure the HTTP request pipeline.

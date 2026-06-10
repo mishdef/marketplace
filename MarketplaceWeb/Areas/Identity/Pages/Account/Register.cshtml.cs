@@ -19,16 +19,16 @@ namespace MarketplaceWeb.Areas.Identity.Pages.Account
     [AllowAnonymous]
     public class RegisterModel : PageModel
     {
-        private readonly SignInManager<UserBase> _signInManager;
-        private readonly UserManager<UserBase> _userManager;
-        private readonly IUserStore<UserBase> _userStore;
-        private readonly IUserEmailStore<UserBase> _emailStore;
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly IUserStore<User> _userStore;
+        private readonly IUserEmailStore<User> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
 
         public RegisterModel(
-            UserManager<UserBase> userManager,
-            IUserStore<UserBase> userStore,
-            SignInManager<UserBase> signInManager,
+            UserManager<User> userManager,
+            IUserStore<User> userStore,
+            SignInManager<User> signInManager,
             ILogger<RegisterModel> logger)
         {
             _userManager = userManager;
@@ -96,8 +96,7 @@ namespace MarketplaceWeb.Areas.Identity.Pages.Account
                 user.Role = UserRoles.Client;
                 user.Password = Input.Password; // Custom plain text password representation
                 user.PhoneNumber = Input.PhoneNumber;
-                user.Address = Input.Address; // Set Client Address
-                user.Cart = new Cart(); // Instantiates a new Cart for the Client!
+                user.ClientInfo = new ClientInfo { Address = Input.Address, Cart = new Cart() };
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -131,27 +130,26 @@ namespace MarketplaceWeb.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private Client CreateUser()
+        private User CreateUser()
         {
             try
             {
-                // Instantiate a concrete Client subtype
-                return Activator.CreateInstance<Client>();
+                return Activator.CreateInstance<User>();
             }
             catch
             {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(Client)}'. " +
-                    $"Ensure that '{nameof(Client)}' is not an abstract class and has a parameterless constructor.");
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(User)}'. " +
+                    $"Ensure that '{nameof(User)}' is not an abstract class and has a parameterless constructor.");
             }
         }
 
-        private IUserEmailStore<UserBase> GetEmailStore()
+        private IUserEmailStore<User> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)
             {
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
-            return (IUserEmailStore<UserBase>)_userStore;
+            return (IUserEmailStore<User>)_userStore;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using MarketplaceData.Model.User;
+using MarketplaceData.Model.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -13,16 +13,16 @@ namespace VetAPI.Services
     {
         public Task<bool> DleteUserAsync(int userId);
 
-        public Task<UserBase?> EditUserAsync(int userId, UserRegistrationRequestDTO registrationRequestDTO);
+        public Task<User?> EditUserAsync(int userId, UserRegistrationRequestDTO registrationRequestDTO);
 
-        public Task<IEnumerable<UserBase>> GetUsers();
+        public Task<IEnumerable<User>> GetUsers();
 
-        public Task<IEnumerable<UserBase>> GetUsersAsync();
+        public Task<IEnumerable<User>> GetUsersAsync();
 
         public Task<bool> IsUserExistsAsync(string username);
 
         public Task<UserLoginResponceDTO?> LoginAsync(UserLoginRequestDTO loginRequestDTO);
 
-        public Task<UserBase?> RegisterAsync(UserRegistrationRequestDTO registrationRequestDTO);
+        public Task<User?> RegisterAsync(UserRegistrationRequestDTO registrationRequestDTO);
     }
 }

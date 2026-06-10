@@ -1,4 +1,4 @@
-﻿using MarketplaceData.Model.User;
+using MarketplaceData.Model.User;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -19,7 +19,7 @@ namespace MarketplaceData.Model.Cart
 
 
         public int ClientId { get; set; }
-        public Client Client {  get; set; }
+        public MarketplaceData.Model.User.User Client {  get; set; }
 
 
         public bool IsPaid { get; set; }

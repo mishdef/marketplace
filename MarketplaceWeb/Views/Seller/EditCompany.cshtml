@@ -1,0 +1,79 @@
+@model MarketplaceWeb.Models.EditCompanyViewModel
+
+@{
+    ViewData["Title"] = "Edit Company Profile";
+}
+
+<div class="container mt-3">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-3">
+        <li class="breadcrumb-item"><a asp-controller="Seller" asp-action="Index">Seller Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Edit Company</li>
+      </ol>
+    </nav>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h3 class="mb-0 text-primary">Edit Company Profile</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="EditCompany" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label"></label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label"></label>
+                            <input asp-for="Address" class="form-control" />
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" type="email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="LogoFile" class="form-label"></label>
+                            <input asp-for="LogoFile" type="file" class="form-control" accept="image/*" />
+                            <span asp-validation-for="LogoFile" class="text-danger"></span>
+
+                            <div class="mt-2">
+                                <label asp-for="LogoUrl" class="form-label text-muted small">Or provide URL instead</label>
+                                <input asp-for="LogoUrl" class="form-control form-control-sm" placeholder="https://example.com/logo.png" />
+                                <span asp-validation-for="LogoUrl" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

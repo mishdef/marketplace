@@ -6,26 +6,27 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using VetClassLibrary.Model;
 using VetClassLibrary.Model.Storage;
 using VetClassLibrary.Model.User;
+
 namespace VetClassLibrary.Services
 {
-    public class AppDbContext :  IdentityDbContext<UserBase, IdentityRole<int>, int>
+    public class AppDbContext : IdentityDbContext<User, IdentityRole<int>, int>
     {
         private readonly string _connectionString;
 
-        public DbSet<Client> Clients { get; set; }
-        public DbSet<Seller> Sellers { get; set; }
-        public DbSet<Admin> Admins { get; set; }
+        public DbSet<ClientInfo> Clients { get; set; }
+        public DbSet<SellerInfo> Sellers { get; set; }
+        public DbSet<AdminInfo> Admins { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<CompanyCart> CompanyCarts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<ClientViewedItem> ClientViewedItems { get; set; }
         public DbSet<Item> Products { get; set; }
         public DbSet<StorageItem> StorageItems { get; set; }
-
-
-
-
 
         public AppDbContext(string connectionString)
         {
@@ -50,13 +51,25 @@ namespace VetClassLibrary.Services
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<UserBase>()
-                .HasDiscriminator<string>("UserType")
-                .HasValue<Client>("Client")
-                .HasValue<Seller>("Seller")
-                .HasValue<Admin>("Admin");
+            modelBuilder.Entity<ClientInfo>()
+                .HasOne(c => c.User)
+                .WithOne(u => u.ClientInfo)
+                .HasForeignKey<ClientInfo>(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Client>().HasIndex(u => u.UserName).IsUnique();
+            modelBuilder.Entity<SellerInfo>()
+                .HasOne(s => s.User)
+                .WithOne(u => u.SellerInfo)
+                .HasForeignKey<SellerInfo>(s => s.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AdminInfo>()
+                .HasOne(a => a.User)
+                .WithOne(u => u.AdminInfo)
+                .HasForeignKey<AdminInfo>(a => a.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<User>().HasIndex(u => u.UserName).IsUnique();
 
             modelBuilder.Entity<Company>()
                 .HasOne(c => c.Owner)
@@ -75,9 +88,31 @@ namespace VetClassLibrary.Services
                 .WithOne(c => c.ParentCategory)
                 .HasForeignKey(c => c.ParentCategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CompanyCart>()
+                .HasOne(cc => cc.Cart)
+                .WithMany(c => c.CompanyCarts)
+                .HasForeignKey(cc => cc.CartId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CartItem>()
+                .HasOne(ci => ci.CompanyCart)
+                .WithMany(cc => cc.CartItems)
+                .HasForeignKey(ci => ci.CompanyCartId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ClientViewedItem>()
+                .HasOne(cvi => cvi.ClientInfo)
+                .WithMany(ci => ci.ViewedItems)
+                .HasForeignKey(cvi => cvi.ClientInfoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             //// ==========================================
-            //// SEED DATA (Начальные данные)
+            //// SEED DATA
             //// ==========================================
+
+            var hasher = new PasswordHasher<User>();
+            var defaultPasswordHash = hasher.HashPassword(null!, "password");
 
             // 0. Roles
             modelBuilder.Entity<IdentityRole<int>>().HasData(
@@ -105,63 +140,56 @@ namespace VetClassLibrary.Services
                 new { Id = 2 }
             );
 
-            // 3. Clients
-            modelBuilder.Entity<Client>().HasData(
+            // 3. Base Users
+            modelBuilder.Entity<User>().HasData(
                 new 
                 {
                     Id = 1,
                     FullName = "Ivan Petrenko",
-                    UserName = "ivan_petr",
-                    NormalizedUserName = "IVAN_PETR",
+                    UserName = "ivan@example.com",
+                    NormalizedUserName = "IVAN@EXAMPLE.COM",
                     Password = "password",
+                    PasswordHash = defaultPasswordHash,
                     Role = VetClassLibrary.Model.User.UserRoles.Client,
                     Email = "ivan@example.com",
                     NormalizedEmail = "IVAN@EXAMPLE.COM",
                     PhoneNumber = "+380501112233",
-                    CartId = 1,
-                    Address = "Kyiv, Khreshchatyk, 1",
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
                     TwoFactorEnabled = false,
                     LockoutEnabled = true,
                     AccessFailedCount = 0,
                     SecurityStamp = "d6e3557e-77cc-44a5-bdf9-2ba831ec41e1",
-                    ConcurrencyStamp = "a7b7a2d1-5db8-4034-8c81-4235e197c36a",
-                    UserType = "Client"
+                    ConcurrencyStamp = "a7b7a2d1-5db8-4034-8c81-4235e197c36a"
                 },
                 new 
                 {
                     Id = 2,
                     FullName = "Maria Kovalenko",
-                    UserName = "maria_kov",
-                    NormalizedUserName = "MARIA_KOV",
+                    UserName = "maria@example.com",
+                    NormalizedUserName = "MARIA@EXAMPLE.COM",
                     Password = "password",
+                    PasswordHash = defaultPasswordHash,
                     Role = VetClassLibrary.Model.User.UserRoles.Client,
                     Email = "maria@example.com",
                     NormalizedEmail = "MARIA@EXAMPLE.COM",
                     PhoneNumber = "+380674445566",
-                    CartId = 2,
-                    Address = "Lviv, Franko, 25",
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
                     TwoFactorEnabled = false,
                     LockoutEnabled = true,
                     AccessFailedCount = 0,
                     SecurityStamp = "f6fbb5de-75cc-44e2-a0e1-0bc51a2dcd22",
-                    ConcurrencyStamp = "b86300df-b118-4ee0-8ba0-0be157ba8d6c",
-                    UserType = "Client"
-                }
-            );
-
-            // 4. Sellers
-            modelBuilder.Entity<Seller>().HasData(
+                    ConcurrencyStamp = "b86300df-b118-4ee0-8ba0-0be157ba8d6c"
+                },
                 new 
                 {
                     Id = 3,
                     FullName = "Tech Seller",
-                    UserName = "tech_seller",
-                    NormalizedUserName = "TECH_SELLER",
+                    UserName = "seller@techstore.com",
+                    NormalizedUserName = "SELLER@TECHSTORE.COM",
                     Password = "password",
+                    PasswordHash = defaultPasswordHash,
                     Role = VetClassLibrary.Model.User.UserRoles.Seller,
                     Email = "seller@techstore.com",
                     NormalizedEmail = "SELLER@TECHSTORE.COM",
@@ -172,16 +200,16 @@ namespace VetClassLibrary.Services
                     LockoutEnabled = true,
                     AccessFailedCount = 0,
                     SecurityStamp = "96d7cfbb-7ac1-4322-9e90-c11efeb9e2d3",
-                    ConcurrencyStamp = "4c3b5d3c-d6a0-4ff6-8c4d-8cfbc1fcf3b2",
-                    UserType = "Seller"
+                    ConcurrencyStamp = "4c3b5d3c-d6a0-4ff6-8c4d-8cfbc1fcf3b2"
                 },
                 new 
                 {
                     Id = 4,
                     FullName = "Fashion Seller",
-                    UserName = "fashion_seller",
-                    NormalizedUserName = "FASHION_SELLER",
+                    UserName = "seller@fashion.com",
+                    NormalizedUserName = "SELLER@FASHION.COM",
                     Password = "password",
+                    PasswordHash = defaultPasswordHash,
                     Role = VetClassLibrary.Model.User.UserRoles.Seller,
                     Email = "seller@fashion.com",
                     NormalizedEmail = "SELLER@FASHION.COM",
@@ -192,9 +220,45 @@ namespace VetClassLibrary.Services
                     LockoutEnabled = true,
                     AccessFailedCount = 0,
                     SecurityStamp = "2a8e8419-86ab-4cb7-a70d-c07adcd515df",
-                    ConcurrencyStamp = "a11d8c1c-43f1-433b-b72e-d01df4fce3f7",
-                    UserType = "Seller"
+                    ConcurrencyStamp = "a11d8c1c-43f1-433b-b72e-d01df4fce3f7"
+                },
+                new 
+                {
+                    Id = 5,
+                    FullName = "System Admin",
+                    UserName = "admin@marketplace.com",
+                    NormalizedUserName = "ADMIN@MARKETPLACE.COM",
+                    Password = "password",
+                    PasswordHash = defaultPasswordHash,
+                    Role = VetClassLibrary.Model.User.UserRoles.Admin,
+                    Email = "admin@marketplace.com",
+                    NormalizedEmail = "ADMIN@MARKETPLACE.COM",
+                    PhoneNumber = "+380000000000",
+                    EmailConfirmed = true,
+                    PhoneNumberConfirmed = true,
+                    TwoFactorEnabled = false,
+                    LockoutEnabled = true,
+                    AccessFailedCount = 0,
+                    SecurityStamp = "f1e2d3c4-b5a6-7890-1234-56789abcdef0",
+                    ConcurrencyStamp = "0fedcba9-8765-4321-0987-654321fedcba"
                 }
+            );
+
+            // 3.1 ClientInfos
+            modelBuilder.Entity<ClientInfo>().HasData(
+                new { Id = 1, UserId = 1, CartId = 1, Address = "Kyiv, Khreshchatyk, 1" },
+                new { Id = 2, UserId = 2, CartId = 2, Address = "Lviv, Franko, 25" }
+            );
+
+            // 3.2 SellerInfos
+            modelBuilder.Entity<SellerInfo>().HasData(
+                new { Id = 1, UserId = 3 },
+                new { Id = 2, UserId = 4 }
+            );
+
+            // 3.3 AdminInfos
+            modelBuilder.Entity<AdminInfo>().HasData(
+                new { Id = 1, UserId = 5 }
             );
 
             // 5. Companies
@@ -299,11 +363,15 @@ namespace VetClassLibrary.Services
                 }
             );
 
-            // 9. CartItems
-            modelBuilder.Entity<CartItem>().HasData(
-                new { Id = 1, ProductId = 1, Quantity = 1.0, OrderId = 1 },
-                new { Id = 2, ProductId = 2, Quantity = 2.0, OrderId = 1 },
-                new { Id = 3, ProductId = 3, Quantity = 3.0, OrderId = 2 }
+
+
+            // 10. User Roles
+            modelBuilder.Entity<IdentityUserRole<int>>().HasData(
+                new IdentityUserRole<int> { RoleId = 1, UserId = 1 },
+                new IdentityUserRole<int> { RoleId = 1, UserId = 2 },
+                new IdentityUserRole<int> { RoleId = 2, UserId = 3 },
+                new IdentityUserRole<int> { RoleId = 2, UserId = 4 },
+                new IdentityUserRole<int> { RoleId = 3, UserId = 5 }
             );
         }
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
@@ -10,7 +10,11 @@ namespace MarketplaceData.Model.Cart
     {
         public int Id { get; set; }
 
+        public int ProductId { get; set; }
         public Item? Product { get; set; }
+
+        public int CompanyCartId { get; set; }
+        public CompanyCart CompanyCart { get; set; } = null!;
 
         public double Quantity { get; set; }
 

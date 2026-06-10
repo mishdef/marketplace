@@ -1,0 +1,102 @@
+@using System.Security.Claims
+@model MarketplaceData.Model.User.Company
+
+@{
+    ViewData["Title"] = "Company Profile";
+    var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    int.TryParse(userIdString, out int userId);
+    bool isOwner = Model != null && Model.OwnerId == userId;
+}
+
+<div class="container mt-3">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-3">
+        <li class="breadcrumb-item active" aria-current="page">Seller Dashboard</li>
+      </ol>
+    </nav>
+    <h1>Company Profile</h1>
+
+    @if (Model == null)
+    {
+        <div class="alert alert-warning">
+            You do not currently have a company associated with your account.
+        </div>
+    }
+    else
+    {
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h3 class="mb-0 text-primary">@Model.Name</h3>
+                <div>
+                    <a asp-controller="ShopItems" asp-action="Index" class="btn btn-outline-info btn-sm me-2">Manage Items</a>
+                    @if (isOwner)
+                    {
+                        <a asp-action="EditCompany" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">Edit Information</a>
+                    }
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                        {
+                            <img src="@Model.LogoUrl" alt="Company Logo" class="img-fluid rounded border mb-3" />
+                        }
+                        else
+                        {
+                            <div class="bg-light d-flex justify-content-center align-items-center rounded border mb-3" style="height: 150px;">
+                                <span class="text-muted">No Logo Available</span>
+                            </div>
+                        }
+                    </div>
+                    <div class="col-md-9">
+                        <p><strong>Description:</strong> @Model.Description</p>
+                        <p><strong>Address:</strong> @Model.Address</p>
+                        <p><strong>Email:</strong> @Model.Email</p>
+                        <p><strong>Phone:</strong> @Model.PhoneNumber</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Employees</h4>
+                @if (isOwner)
+                {
+                    <a asp-action="AddEmployee" asp-route-companyId="@Model.Id" class="btn btn-outline-success btn-sm">Add Employee</a>
+                }
+            </div>
+            <div class="card-body">
+                @if (Model.Employees != null && Model.Employees.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var employee in Model.Employees)
+                                {
+                                    <tr>
+                                        <td>@employee.User?.FullName</td>
+                                        <td>@employee.User?.Email</td>
+                                        <td>@employee.User?.PhoneNumber</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No employees have been added yet.</p>
+                }
+            </div>
+        </div>
+    }
+</div>

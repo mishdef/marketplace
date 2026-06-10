@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+@using Microsoft.AspNetCore.Identity
+@using MarketplaceData.Model.User
+@using MarketplaceData.Interfaces
+@inject UserManager<User> UserManager
+@inject ICartService CartService
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -23,6 +28,42 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            int cartItemCount = 0;
+                            var user = await UserManager.GetUserAsync(User);
+                            if (user != null)
+                            {
+                                try
+                                {
+                                    var cart = await CartService.GetUserCartAsync(user.Id);
+                                    cartItemCount = cart.CompanyCarts.SelectMany(c => c.CartItems).Count();
+                                }
+                                catch { }
+                            }
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">
+                                    Cart
+                                    @if (cartItemCount > 0)
+                                    {
+                                        <span class="badge bg-primary rounded-pill">@cartItemCount</span>
+                                    }
+                                </a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Admin Dashboard</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Seller"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Seller" asp-action="Index">Seller Dashboard</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>

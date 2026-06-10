@@ -8,8 +8,12 @@ using VetClassLibrary.Model.User;
 
 namespace MarketplaceData.Model.User
 {
-    public abstract class UserBase : IdentityUser<int>
+    public class User : IdentityUser<int>
     {
+        public ClientInfo? ClientInfo { get; set; }
+        public SellerInfo? SellerInfo { get; set; }
+        public AdminInfo? AdminInfo { get; set; }
+
         private string _role = UserRoles.Client;
         private string _fullName = null!;
         private string _password = null!;

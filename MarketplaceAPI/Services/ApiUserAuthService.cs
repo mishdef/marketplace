@@ -37,7 +37,7 @@ namespace VetAPI.Services
             }
         }
 
-        public async Task<UserBase?> EditUserAsync(int userId, UserRegistrationRequestDTO registrationRequestDTO)
+        public async Task<User?> EditUserAsync(int userId, UserRegistrationRequestDTO registrationRequestDTO)
         {
             try
             {
@@ -61,12 +61,12 @@ namespace VetAPI.Services
             }
         }
 
-        public async Task<IEnumerable<UserBase>> GetUsers()
+        public async Task<IEnumerable<User>> GetUsers()
         {
             return await _userService.GetAllAsync();
         }
 
-        public async Task<IEnumerable<UserBase>> GetUsersAsync()
+        public async Task<IEnumerable<User>> GetUsersAsync()
         {
             return await _userService.GetAllAsync();
         }
@@ -101,7 +101,7 @@ namespace VetAPI.Services
             }
         }
 
-        public async Task<UserBase?> RegisterAsync(UserRegistrationRequestDTO registrationRequestDTO)
+        public async Task<User?> RegisterAsync(UserRegistrationRequestDTO registrationRequestDTO)
         {
             try
             {
@@ -112,13 +112,17 @@ namespace VetAPI.Services
 
                 var dto = registrationRequestDTO;
 
-                UserBase user = dto.Role switch
-                {
-                    "Admin" => new Admin(),
-                    "Client" => new Client(),
-                    "Seller" => new Seller(),
-                    _ => throw new InvalidOperationException($"Invalid role {dto.Role}")
-                };
+                User user = new User();
+                
+                if (dto.Role == "Admin") {
+                    user.AdminInfo = new AdminInfo();
+                } else if (dto.Role == "Client") {
+                    user.ClientInfo = new ClientInfo();
+                } else if (dto.Role == "Seller") {
+                    user.SellerInfo = new SellerInfo();
+                } else {
+                    throw new InvalidOperationException($"Invalid role {dto.Role}");
+                }
 
                 user.FullName = dto.FullName;
                 user.PhoneNumber = dto.PhoneNumber;
@@ -138,7 +142,7 @@ namespace VetAPI.Services
             }
         }
 
-        private string GenerateJwtToken(UserBase user)
+        private string GenerateJwtToken(User user)
         {
             var key = Encoding.ASCII.GetBytes(_configuration.GetSection("JwtSettings")["Secret"]);
 

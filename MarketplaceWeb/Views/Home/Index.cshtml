@@ -19,6 +19,37 @@
             </div>
         </div>
         <div class="col-9">
+            @if (Model.RecentlyViewed.Any())
+            {
+                <h2 class="my-4">Recently Viewed</h2>
+                <div class="container-fluid mb-5">
+                    <div class="row">
+                        @foreach (var item in Model.RecentlyViewed)
+                        {
+                            <component type="typeof(MarketplaceWeb.Components.ItemCard)"
+                                       render-mode="Static"
+                                       param-Item="item" />
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (Model.RecommendedItems.Any())
+            {
+                <h2 class="my-4">Recommended for You</h2>
+                <div class="container-fluid mb-5">
+                    <div class="row">
+                        @foreach (var item in Model.RecommendedItems)
+                        {
+                            <component type="typeof(MarketplaceWeb.Components.ItemCard)"
+                                       render-mode="Static"
+                                       param-Item="item" />
+                        }
+                    </div>
+                </div>
+            }
+
+            <h2 class="my-4">All Items</h2>
             <div class="container-fluid">
                 <div class="row">
                     @foreach (var item in Model.Items)
