@@ -857,3 +857,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /MarketplaceWeb/UploadedPictures
+/.agents/skills/caveman
+/MarketplaceAPI/DTO/UserLoginResponceDTO.cs
+/skills-lock.json
