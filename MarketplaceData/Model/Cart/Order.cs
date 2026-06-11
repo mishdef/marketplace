@@ -31,5 +31,7 @@ namespace MarketplaceData.Model.Cart
 
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
+        public string? ShipmentCompany { get; set; }
+        public string? ShipmentAddress { get; set; }
     }
 }

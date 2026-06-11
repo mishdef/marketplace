@@ -73,7 +73,6 @@ namespace MarketplaceWeb.Controllers
             var storageItems = _storageService.GetStorageItems(item.CompanyId);
             var storageItem = storageItems.FirstOrDefault(s => s.ItemId == id);
             ViewBag.AvailableQuantity = storageItem?.Qty ?? 0;
-
             ViewBag.CompanyRecommendations = await _recommendationService.GetCompanyRecommendationsAsync(item.CompanyId, item.Id);
             ViewBag.SimilarItems = await _recommendationService.GetSimilarItemsAsync(item.CategoryId, item.CompanyId);
 

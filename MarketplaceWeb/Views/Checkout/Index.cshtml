@@ -1,10 +1,10 @@
-@using MarketplaceData.Model.Cart
-@model CompanyCart
+@using MarketplaceWeb.DTO
+@model CheckoutViewModel
 
 <div class="container">
     <div class="card mb-4 shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Seller: @Model.Company.Name</h5>
+            <h5 class="mb-0">Seller: @Model.CompanyCart.Company.Name</h5>
         </div>
         <div class="card-body p-0">
             <table class="table table-hover mb-0">
@@ -18,7 +18,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.CartItems)
+                    @foreach (var item in Model.CompanyCart.CartItems)
                     {
                         <tr>
                             <td>
@@ -51,14 +51,52 @@
                 <tfoot class="table-light">
                     <tr>
                         <td colspan="3" class="text-end"><strong>Company Subtotal:</strong></td>
-                        <td colspan="2"><strong>$@Model.CartItems.Sum(ci => ci.Subtotal)</strong></td>
+                        <td colspan="2"><strong>$@Model.CompanyCart.CartItems.Sum(ci => ci.Subtotal)</strong></td>
                     </tr>
                 </tfoot>
             </table>
+
+            <div class="container">
+
+            </div>
         </div>
     </div>
 
-    <div class="d-flex justify-content-center mt-3">
-        <a class="btn btn-primary" asp-action="Index" asp-controller="Payment" asp-route-companyId="@Model.CompanyId">Checkout</a>
+    <div class="card mt-4 shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Shipping Details</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="Index" asp-controller="Payment" method="post">
+                <input type="hidden" name="companyId" value="@Model.CompanyCart.CompanyId" />
+                
+                <div class="mb-3">
+                    <label for="shipmentCompany" class="form-label">Shipment Company</label>
+                    <select class="form-select" id="shipmentCompany" name="shipmentCompany" required>
+                        <option value="">Choose a shipment company...</option>
+                        @if (Model.ShipmentCompanies != null && Model.ShipmentCompanies.Any())
+                        {
+                            foreach(var company in Model.ShipmentCompanies)
+                            {
+                                <option value="@company.Name">@company.Name</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="Standard Shipping">Standard Shipping</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="shipmentAddress" class="form-label">Shipment Address</label>
+                    <input type="text" class="form-control" id="shipmentAddress" name="shipmentAddress" placeholder="e.g. 123 Main St, City, Country" required />
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-primary px-4">Proceed to Payment</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>

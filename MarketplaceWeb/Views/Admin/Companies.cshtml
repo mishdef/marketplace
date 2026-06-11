@@ -1,0 +1,45 @@
+@using MarketplaceData.Model.User
+@model IEnumerable<Company>
+@{
+    ViewData["Title"] = "Companies Management";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Companies</h2>
+        <a asp-action="CreateCompany" class="btn btn-primary">Create New Company</a>
+    </div>
+
+    <table class="table table-striped table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Owner ID</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var company in Model)
+            {
+                <tr>
+                    <td>@company.Id</td>
+                    <td>@company.Name</td>
+                    <td>@company.Description</td>
+                    <td>@company.Address</td>
+                    <td>@company.PhoneNumber</td>
+                    <td>@company.OwnerId</td>
+                    <td>
+                        <a asp-action="EditCompany" asp-route-id="@company.Id" class="btn btn-sm btn-warning">Edit</a>
+                        <form asp-action="DeleteCompany" asp-route-id="@company.Id" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this company? All related data will be cascaded and deleted.');">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

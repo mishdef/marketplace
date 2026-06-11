@@ -23,6 +23,14 @@
                         <p class="mb-2"><strong>Order ID:</strong> #@Model.Id</p>
                         <p class="mb-2"><strong>Date:</strong> @Model.Date.ToString("g")</p>
                         <p class="mb-2"><strong>Status:</strong> <span class="badge bg-warning text-dark">@Model.Status</span></p>
+                        @if (!string.IsNullOrEmpty(Model.ShipmentCompany))
+                        {
+                            <p class="mb-2"><strong>Shipment Company:</strong> @Model.ShipmentCompany</p>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.ShipmentAddress))
+                        {
+                            <p class="mb-2"><strong>Shipment Address:</strong> @Model.ShipmentAddress</p>
+                        }
                         <hr />
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="fw-bold">Total Paid:</span>

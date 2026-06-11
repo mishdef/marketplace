@@ -29,6 +29,7 @@ namespace MarketplaceData.Services
                              .Include(c => c.Owner)
                              .Include(c => c.Employees)
                              .Include(c => c.StoreItems)
+                             .Include(c => c.ShippingCompanies)
                              .FirstOrDefault(c => c.Id == id);
             });
         }
@@ -39,7 +40,29 @@ namespace MarketplaceData.Services
                          .Include(c => c.Owner)
                          .Include(c => c.Employees)
                          .Include(c => c.StoreItems)
+                         .Include(c => c.ShippingCompanies)
                          .ToList();
+        }
+
+        public async Task UpdateCompanyShipmentsAsync(int companyId, List<int> shipmentCompanyIds)
+        {
+            var company = await _dbSet.Include(c => c.ShippingCompanies)
+                                      .FirstOrDefaultAsync(c => c.Id == companyId);
+            if (company != null)
+            {
+                var newShipments = await _context.Set<Model.ShipmentCompany>()
+                                                 .Where(sc => shipmentCompanyIds.Contains(sc.Id))
+                                                 .ToListAsync();
+                
+                company.ShippingCompanies.Clear();
+                foreach (var sc in newShipments)
+                {
+                    company.ShippingCompanies.Add(sc);
+                }
+                
+                await _context.SaveChangesAsync();
+                _cache.Remove($"Company_{companyId}");
+            }
         }
     }
 }

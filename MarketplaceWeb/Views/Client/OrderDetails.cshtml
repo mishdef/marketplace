@@ -29,6 +29,14 @@
                     {
                         <p><strong>Seller:</strong> @Model.Company.Name</p>
                     }
+                    @if (!string.IsNullOrEmpty(Model.ShipmentCompany))
+                    {
+                        <p><strong>Shipment Company:</strong> @Model.ShipmentCompany</p>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ShipmentAddress))
+                    {
+                        <p><strong>Shipment Address:</strong> @Model.ShipmentAddress</p>
+                    }
                 </div>
             </div>
         </div>

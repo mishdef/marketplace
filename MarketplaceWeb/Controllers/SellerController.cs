@@ -21,18 +21,22 @@ namespace MarketplaceWeb.Controllers
         private readonly IPicturesService _picturesService;
         private readonly IStorageService _storageService;
 
+        private readonly IShipmentCompaniesService _shipmentCompaniesService;
+
         public SellerController(
             ISellerService sellerService, 
             ICompanyService companyService, 
             UserManager<User> userManager,
             IPicturesService picturesService,
-            IStorageService storageService)
+            IStorageService storageService,
+            IShipmentCompaniesService shipmentCompaniesService)
         {
             _sellerService = sellerService;
             _companyService = companyService;
             _userManager = userManager;
             _picturesService = picturesService;
             _storageService = storageService;
+            _shipmentCompaniesService = shipmentCompaniesService;
         }
 
         [Authorize(Roles = "Seller")]
@@ -59,7 +63,7 @@ namespace MarketplaceWeb.Controllers
         }
 
         [HttpGet]
-        public IActionResult EditCompany(int id)
+        public async Task<IActionResult> EditCompany(int id)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId)) return Unauthorized();
@@ -77,7 +81,9 @@ namespace MarketplaceWeb.Controllers
                 Address = company.Address,
                 PhoneNumber = company.PhoneNumber,
                 Email = company.Email,
-                LogoUrl = company.LogoUrl
+                LogoUrl = company.LogoUrl,
+                AvailableShipmentCompanies = (await _shipmentCompaniesService.GetAllAsync()).ToList(),
+                SelectedShipmentCompanyIds = company.ShippingCompanies?.Select(sc => sc.Id).ToList() ?? new List<int>()
             };
 
             return View(model);
@@ -125,6 +131,7 @@ namespace MarketplaceWeb.Controllers
             }
 
             _companyService.Update(company);
+            await _companyService.UpdateCompanyShipmentsAsync(model.Id, model.SelectedShipmentCompanyIds);
 
             return RedirectToAction(nameof(Index));
         }

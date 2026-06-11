@@ -22,7 +22,8 @@ namespace MarketplaceWeb.Controllers
             _orderService = orderService;
         }
 
-        public async Task<IActionResult> Index(int companyId)
+        [HttpPost]
+        public async Task<IActionResult> Index(int companyId, string shipmentCompany, string shipmentAddress)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
@@ -35,11 +36,11 @@ namespace MarketplaceWeb.Controllers
                 return RedirectToAction("Index", "Cart");
             }
 
-            return CreateCheckoutSession(companyCart);
+            return CreateCheckoutSession(companyCart, shipmentCompany, shipmentAddress);
         }
 
         [HttpPost]
-        public IActionResult CreateCheckoutSession(CompanyCart companyCart)
+        public IActionResult CreateCheckoutSession(CompanyCart companyCart, string shipmentCompany, string shipmentAddress)
         {
             var domain = "http://localhost:5209";
 
@@ -68,6 +69,12 @@ namespace MarketplaceWeb.Controllers
 
             options.Mode = "payment";
             options.SuccessUrl = domain + "/Payment/Success?sessionId={CHECKOUT_SESSION_ID}&companyId=" + companyCart.CompanyId;
+            options.CancelUrl = domain + "/Cart";
+            options.Metadata = new Dictionary<string, string>
+            {
+                { "ShipmentCompany", shipmentCompany ?? "" },
+                { "ShipmentAddress", shipmentAddress ?? "" }
+            };
             options.CancelUrl = domain + "/Cart";
 
             var service = new SessionService();
@@ -102,6 +109,8 @@ namespace MarketplaceWeb.Controllers
                         IsPaid = true,
                         IsPerformed = false,
                         Status = OrderStatus.Pending,
+                        ShipmentCompany = session.Metadata.ContainsKey("ShipmentCompany") ? session.Metadata["ShipmentCompany"] : null,
+                        ShipmentAddress = session.Metadata.ContainsKey("ShipmentAddress") ? session.Metadata["ShipmentAddress"] : null,
                         OrderItems = companyCart.CartItems.Select(ci => new OrderItem
                         {
                             ProductId = ci.ProductId,

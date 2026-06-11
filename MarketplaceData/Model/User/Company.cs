@@ -18,7 +18,7 @@ namespace MarketplaceData.Model.User
 
         public string? LogoUrl { get; set; }
 
-        public ICollection<string> ShippingCompanies { get; set; } = new List<string>();
+        public List<ShipmentCompany> ShippingCompanies { get; set; } = new List<ShipmentCompany>();
 
         public ICollection<SellerInfo>? Employees { get; set; } = null!;
         public ICollection<Item>? StoreItems { get; set; } = null!;

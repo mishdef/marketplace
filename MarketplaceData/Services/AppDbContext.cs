@@ -28,7 +28,7 @@ namespace VetClassLibrary.Services
         public DbSet<ClientViewedItem> ClientViewedItems { get; set; }
         public DbSet<Item> Products { get; set; }
         public DbSet<StorageItem> StorageItems { get; set; }
-
+        public DbSet<ShipmentCompany> ShipmentCompanies { get; set; }
         public AppDbContext(string connectionString)
         {
             _connectionString = connectionString;
@@ -82,7 +82,11 @@ namespace VetClassLibrary.Services
                 .HasMany(c => c.Employees)
                 .WithOne(s => s.Company)
                 .HasForeignKey(s => s.CompanyId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Company>()
+                .HasMany(c => c.ShippingCompanies)
+                .WithMany();
 
             modelBuilder.Entity<Category>()
                 .HasMany(c => c.SubCategories)
@@ -273,8 +277,7 @@ namespace VetClassLibrary.Services
                     PhoneNumber = "+380991122334",
                     Email = "contact@techstore.com",
                     OwnerId = 3,
-                    LogoUrl = "/images/logo1.jpg",
-                    ShippingCompanies = new List<string>()
+                    LogoUrl = "/images/logo1.jpg"
                 },
                 new 
                 {
@@ -285,8 +288,7 @@ namespace VetClassLibrary.Services
                     PhoneNumber = "+380995544332",
                     Email = "contact@fashion.com",
                     OwnerId = 4,
-                    LogoUrl = "/images/logo2.jpg",
-                    ShippingCompanies = new List<string>()
+                    LogoUrl = "/images/logo2.jpg"
                 }
             );
 

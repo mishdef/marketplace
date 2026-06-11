@@ -29,6 +29,9 @@ namespace MarketplaceWeb.Models
 
         [Display(Name = "Upload Logo")]
         public Microsoft.AspNetCore.Http.IFormFile? LogoFile { get; set; }
+
+        public List<int> SelectedShipmentCompanyIds { get; set; } = new List<int>();
+        public List<MarketplaceData.Model.ShipmentCompany>? AvailableShipmentCompanies { get; set; }
     }
 
     public class AddEmployeeViewModel
